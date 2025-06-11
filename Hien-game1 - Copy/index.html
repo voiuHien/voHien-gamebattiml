@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thu Hiền</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Comic Sans MS", cursive;
+      background: linear-gradient(to bottom right, #ffe0f0, #ffd6e8);
+      text-align: center;
+      overflow: hidden;
+    }
+
+    h1 {
+      margin-top: 20px;
+      color: #d63384;
+      font-size: 24px;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .score {
+      font-size: 20px;
+      color: #880e4f;
+    }
+
+    #game-container {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 100px);
+      overflow: hidden;
+    }
+
+    .heart, .bomb {
+      width: 40px;
+      height: 40px;
+      position: absolute;
+      background-size: cover;
+      animation: fall linear forwards;
+      cursor: pointer;
+    }
+
+    .heart {
+      background-image: url('https://cdn-icons-png.flaticon.com/512/833/833472.png');
+    }
+
+    .bomb {
+      background-image: url('https://cdn-icons-png.flaticon.com/512/564/564619.png');
+    }
+
+    @keyframes fall {
+      0% { top: -50px; opacity: 1; }
+      100% { top: 100%; opacity: 0.6; }
+    }
+
+    .message {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 15px;
+      font-size: 20px;
+      color: #d63384;
+      animation: fadeInOut 3s ease;
+      z-index: 1000;
+    }
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; transform: scale(0.9) translate(-50%, -50%); }
+      30% { opacity: 1; transform: scale(1.05) translate(-50%, -50%); }
+      100% { opacity: 0; transform: scale(1) translate(-50%, -50%); }
+    }
+  </style>
+</head>
+<body>
+  <h1>bắt tim đi vợ ơi :)))))💖</h1>
+  <p class="score">Điểm: <span id="score">0</span></p>
+  <div id="game-container"></div>
+
+  <script>
+    const container = document.getElementById("game-container");
+    const scoreEl = document.getElementById("score");
+    let score = 0;
+    let fallSpeed = 4000;
+    let interval = 1000;
+
+    function createFallingObject() {
+      const isHeart = Math.random() > 0.2; // 80% tim, 20% bom
+      const obj = document.createElement("div");
+      obj.classList.add(isHeart ? "heart" : "bomb");
+      obj.style.left = Math.random() * (window.innerWidth - 40) + "px";
+      obj.style.animationDuration = fallSpeed + "ms";
+
+      if (isHeart) {
+        obj.addEventListener("click", () => {
+          score++;
+          scoreEl.textContent = score;
+          obj.remove();
+          heartVibrate();
+          checkMilestone(score);
+        });
+      } else {
+        obj.addEventListener("click", () => {
+          score = Math.max(0, score - 1);
+          scoreEl.textContent = score;
+          obj.remove();
+          bombVibrate();
+        });
+      }
+
+      container.appendChild(obj);
+      setTimeout(() => obj.remove(), fallSpeed + 200);
+    }
+
+    function heartVibrate() {
+      document.body.style.transform = "scale(1.01)";
+      setTimeout(() => {
+        document.body.style.transform = "scale(1)";
+      }, 100);
+    }
+
+    function bombVibrate() {
+      document.body.style.transform = "rotate(1deg)";
+      setTimeout(() => {
+        document.body.style.transform = "rotate(0deg)";
+      }, 150);
+    }
+
+    function checkMilestone(score) {
+      const milestones = {
+        5: "Thu Hiền dễ thương quá trời ơi! 💕",
+        10: "Em giỏi quá! Cho hun cái 😘",
+        15: "Em có biết không, anh thương em nhiều lắm 💗",
+        20: "Em là món quà tuyệt vời nhất của đời anh 🎁",
+        25: "Thu Hiền là vô đối luôn rồi!!! 💖",
+        40: "phải lấy :)))) 💍💖",
+      };
+
+      if (milestones[score]) {
+        showMessage(milestones[score]);
+      }
+
+      if (score % 10 === 0 && fallSpeed > 1500) {
+        fallSpeed -= 300;
+        interval = Math.max(300, interval - 50);
+        restartSpawner();
+      }
+    }
+
+    function showMessage(text) {
+      const msg = document.createElement("div");
+      msg.classList.add("message");
+      msg.innerText = text;
+      document.body.appendChild(msg);
+      setTimeout(() => msg.remove(), 3000);
+    }
+
+    let spawner = setInterval(createFallingObject, interval);
+
+    function restartSpawner() {
+      clearInterval(spawner);
+      spawner = setInterval(createFallingObject, interval);
+    }
+  </script>
+</body>
+</html>
